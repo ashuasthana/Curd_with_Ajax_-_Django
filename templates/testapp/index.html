@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">   
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css.map' %}">    
+    <title>curd with ajax & django</title>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center alert alert-primary my-3 shadow">Curd Operation with Ajax & Django</h2>
+    <div class="row" >
+        <div class="col-sm-5 my-3 mx-3 shadow">
+            <h2 class="text-center alert alert-warning shadow">Student Registration Form</h2>
+            <hr>
+            <div class="text-center alert alert-warning" id="msg" style="display: none;"></div>
+            
+            <form action="" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="stuid" id="stuid"/>
+                {{ form.as_p }}
+                <input type="submit" id="submit_1" class="btn btn-success my-2">
+            </form>
+            
+        </div>
+    
+        <div class="col-sm-6 my-3 ms-5 shadow">
+            <h2 class="text-center alert alert-info shadow">Student List</h2>
+            <hr>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <div id="custom-dialog" style="display: none;">
+                    <div class="text-center alert alert-warning">
+                    <p >Are you sure you want to delete this data?</p>
+                    <button id="btn-ok" class="btn btn-danger btn-sm">OK</button>
+                    <button id="btn-cancel" class="btn btn-success btn-sm">Cancel</button>
+                </div>
+                </div>
+                <tbody id="tbody">
+                    {% for student in data %}
+                        <tr >
+                            <td>{{student.id}}</td>
+                            <td>{{student.name}}</td>
+                            <td>{{student.email}}</td>
+                            <td>{{student.password}}</td>  
+                            <td><button id="btn_edit" class="btn btn-warning btn-sm" data-sid={{student.id}}>Edit</button> <button id="btn_del" class="btn btn-danger btn-sm" data-sid={{student.id}}>Del</button></td> 
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div> 
+</div>    
+<script src="{% static 'js/jquery.js' %}"></script> 
+<script src="{% static 'js/popper.js' %}"></script>
+<script src="{% static 'js/bootstrap.js' %}"></script> 
+{% include 'testapp/include/ajax.html' %}
+</body>
+</html>

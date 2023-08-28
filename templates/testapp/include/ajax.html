@@ -1,0 +1,169 @@
+<script>
+    //Add data form to database and retrive data from database to table.
+    $("#submit_1").click(function() {
+        event.preventDefault();
+        // $("#tbody").html("Hello"); 
+        output = "";  // Initialize output here
+        let sid = $("#stuid").val();
+        let nm = $("#name_id").val();
+        let em = $("#email_id").val();
+        let pw = $("#password_id").val();
+        let csrf = $("input[name=csrfmiddlewaretoken]").val();
+    
+        if (nm == "") {
+            console.log("Enter Name");
+        } else if (em == "") {
+            console.log("Enter Email");
+        } else if (pw == "") {
+            console.log("Enter Password");
+        } else {
+            let mydata = { 'stuid':sid, name: nm, email: em, password: pw, csrfmiddlewaretoken: csrf };
+            let mythis = this;
+            $.ajax({
+                url: "{% url 'add' %}",
+                method: "POST",
+                data: mydata,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.status == 1) {
+                        let x = data.stu_list;  
+                        // console.log(x);
+                        // console.log(x.length)
+                        for (let i = 0; i < x.length; i++) {                     
+                            // alert("Loop");
+                            // console.log(i)
+                            output += "<tr><td>" + x[i].id + "</td><td>" + x[i].name + "</td><td>" + x[i].email + "</td><td>" + x[i].password + "</td><td><button type='button' id='btn_edit' class='btn btn-warning btn-sm' value='Edit' data-sid=" + x[i].id + ">Edit</button> <button type='button' id='btn_del' class='btn btn-danger btn-sm' value='Del' data-sid=" + x[i].id + ">Del</button></td></tr>";
+                        }
+                        $("#tbody").html(output);  // Populate tbody with generated output
+                        $("form")[0].reset();
+
+                        //show msg in id=msg div tag
+                        $("#msg").text("Data Inserted Successfully!");
+                            $("#msg").show();
+                        //start Hide the message after 2 seconds
+                        setTimeout(function() {
+                             $("#msg").hide();
+                            }, 2000); // 2000 milliseconds = 2 seconds    
+                        //end show msg in id=msg div tag
+                    }
+                    if (data.status == 0) {
+                        // alert("Status_Code Is 0");
+                        //show msg in id=msg div tag
+                        $("#msg").text("Email Invalid, Try Again!");
+                            $("#msg").show();
+                        //start Hide the message after 2 seconds
+                        setTimeout(function() {
+                             $("#msg").hide();
+                            }, 3000); // 3000 milliseconds = 3 seconds    
+                        //end show msg in id=msg div tag
+                    }
+                },
+                error: function(error) {
+                   alert("Error:", error);
+                }
+            });
+        }
+    });
+    
+    </script>
+    
+    <script>
+        //Add Delete data from database by table del button.
+        $("tbody").on("click","#btn_del",function() {   
+            event.preventDefault();     
+            let id = $(this).attr("data-sid");
+            let csrf = $("input[name=csrfmiddlewaretoken]").val();
+            let mythis = this;
+            //ok or cancel condition for delete
+            $("#custom-dialog").show();
+            
+            $("#btn-ok").click(function() {
+                $("#custom-dialog").hide();
+                // console.log("Delete Button Pressed.1");
+                
+                // console.log("Code is running-2");
+                // console.log("Id:1st Base"+id);
+                
+                let mydata = {sid: id,csrfmiddlewaretoken: csrf};
+                // console.log("Id:2nd Base"+id);
+                // console.log("Code is running-3");   
+                $.ajax({
+                    url: "{% url 'delete' %}",
+                    method: "POST",
+                    data: mydata,
+                    dataType: 'json',
+                    success: function(data) {
+                        // console.log(data.success);
+                        // console.log("Code is running-3")
+                        if (data.success == 1) { 
+                            // console.log("Data Deleteed");
+                            // console.log(data.success )
+                            $(mythis).closest("tr").fadeOut();
+                            // console.log("Table Refreshed.")
+
+                            //show msg in id=msg div tag
+                            $("#msg").text("Data Deleteded Successfully!");
+                                $("#msg").show();
+                            //start Hide the message after 2 seconds
+                            setTimeout(function() {
+                                $("#msg").hide();
+                                }, 2000); // 2000 milliseconds = 2 seconds    
+                            //end show msg in id=msg div tag
+                            }
+                        if (data.success == 0) {
+                            // console.log("Code is running-4")
+                    
+                                
+                            }
+                        },
+                    error: function(error) {
+                        alert("Error:", error);
+                        }
+                    });
+            });
+  
+            $("#btn-cancel").click(function() {
+                $("#custom-dialog").hide();
+                // console.log("Cancel Button Pressed.");
+            });
+        });
+</script>
+
+<script>
+    //edit data from form to database by edit button.
+    $("tbody").on("click","#btn_edit",function() {   
+        event.preventDefault();     
+        let id = $(this).attr("data-sid");
+        let csrf = $("input[name=csrfmiddlewaretoken]").val();
+        let mythis = this;
+        //ok or cancel condition for delete
+            
+            // console.log("Edit Code is running-2");
+            // console.log("Id:1st Base "+id);
+            
+            let mydata = {sid: id,csrfmiddlewaretoken: csrf};
+            // console.log("Id:2nd Base"+id);
+            // console.log("Code is running-3");   
+            $.ajax({
+                url: "{% url 'edit' %}",
+                method: "POST",
+                data: mydata,
+                dataType: 'json',
+                success: function(data) {
+                    // console.log(data.stu_detail);
+                    // console.log("Code is running-32");
+                    $("#stuid").val(data.stu_detail.id); // Make sure to use the correct object key
+                    $("#name_id").val(data.stu_detail.name); // Make sure to use the correct object key
+                    $("#email_id").val(data.stu_detail.email); // Make sure to use the correct object key
+                    $("#password_id").val(data.stu_detail.password); // Make sure to use the correct object key
+                    // console.log("Code is running-34");
+                    
+                    },
+
+                error: function(error) {
+                    alert("Error:", error);
+                }
+            });
+    });
+</script>
+           
